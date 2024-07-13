@@ -195,3 +195,4 @@ $RECYCLE.BIN/
 *.xml
 *.iml
 *.DS_STORE
+./idea
