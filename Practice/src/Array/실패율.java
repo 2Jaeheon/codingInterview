@@ -11,8 +11,8 @@ public class 실패율 {
         int[] stages = {2, 1, 2, 6, 2, 4, 3, 3};
         int[] stages2 = {2, 1, 2, 6, 2, 4, 3, 3, 5, 1};
 
-        System.out.println(Arrays.toString(solution(N, stages)));
-        //System.out.println(Arrays.toString(solution(N, stages2)));
+        //System.out.println(Arrays.toString(solution(N, stages)));
+        System.out.println(Arrays.toString(solution2(N, stages)));
     }
 
     public static int[] solution(int N, int[] stages) {
@@ -51,5 +51,35 @@ public class 실패율 {
             .toArray(); // 배열로 변환
 
         return answer;
+    }
+
+
+    public static int[] solution2(int N, int[] stages) {
+        //Stage별 도전자 수를 구함
+        int[] challenger = new int[N + 2];
+
+        for (int i = 0; i < stages.length; i++) {
+            //stages배열 안에는 스테이지의 인덱스가 들어있으므로 다음과 같이 스테이지별 도전자 수를 구함
+            challenger[stages[i]]++;
+        }
+
+        //스테이지별 실패한 사용자 수 계산
+        HashMap<Integer, Double> fails = new HashMap<>();
+        double total = stages.length;
+
+        //각 스테이지를 순회하, 실패율을 계산
+        for (int i = 1; i <= N; i++) {
+            if (challenger[i] == 0) {
+                fails.put(i, 0.);
+            } else {
+                fails.put(i, challenger[i] / total); //실패율을 구해서 map에 넣음
+                total -= challenger[i]; //다음 스테이지의 실패율을 구하기 위해 현재 스테이지 인원을 뺌
+            }
+        }
+
+        //실패율이 높은 스테이지부터 내림차순으로 정렬
+        return fails.entrySet().stream()
+            .sorted((o1, o2) -> Double.compare(o2.getValue(), o1.getValue()))
+            .mapToInt(HashMap.Entry::getKey).toArray();
     }
 }
