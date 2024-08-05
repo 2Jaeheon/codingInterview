@@ -13,8 +13,8 @@ public class 방문_길이 {
     public static void main(String[] args) {
         String data = "ULURRDLLU";
         String data2 = "LULLLLLLU";
-        System.out.println(solution(data));
-        System.out.println(solution(data2));
+        System.out.println(solution2(data));
+        System.out.println(solution2(data2));
     }
 
     public static int solution(String dirs) {
@@ -60,5 +60,44 @@ public class 방문_길이 {
         }
 
         return visitedPaths.size() / 2; // 양방향 경로 저장이므로 2로 나눔
+    }
+
+    private static boolean isValidMove(int nx, int ny) {
+        return 0 <= nx && nx < 11 && 0 <= ny && ny < 11;
+    }
+
+    static HashMap<Character, int[]> location = new HashMap<>();
+
+    private static void initLocation() {
+        location.put('U', new int[]{0, 1});
+        location.put('D', new int[]{0, -1});
+        location.put('L', new int[]{-1, 0});
+        location.put('R', new int[]{1, 0});
+    }
+
+    public static int solution2(String dirs) {
+        initLocation();
+        int x = 5, y = 5;
+        HashSet<String> set = new HashSet<>();
+        for (int i = 0; i < dirs.length(); i++) {
+            //해시맵에서 배열에서 방향에 따라서 nextX와 nextY에 각각 저장한다.
+            int[] offset = location.get(dirs.charAt(i));
+            int nextX = x + offset[0];
+            int nextY = y + offset[1];
+
+            if (!isValidMove(nextX, nextY)) {
+                continue;
+            }
+
+            //A->B랑 B->A모두 추가함.
+            set.add(x + "" + y + "" + nextX + "" + nextY);
+            set.add(nextX + "" + nextY + "" + x + "" + y);
+
+            //좌표를 이동했으니까 갱신
+            x = nextX;
+            y = nextY;
+        }
+
+        return set.size() / 2;
     }
 }
