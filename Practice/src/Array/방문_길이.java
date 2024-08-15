@@ -100,4 +100,142 @@ public class 방문_길이 {
 
         return set.size() / 2;
     }
+
+    // Node class to represent the state of each cell
+    static class Node {
+
+        boolean visitedFromUp;
+        boolean visitedFromDown;
+        boolean visitedFromRight;
+        boolean visitedFromLeft;
+
+        Node() {
+            this.visitedFromUp = false;
+            this.visitedFromDown = false;
+            this.visitedFromRight = false;
+            this.visitedFromLeft = false;
+        }
+    }
+
+    public int solution3(String dirs) {
+        // 2차원 배열을 사용하여 각 위치의 노드 상태를 저장
+        Node[][] grid = new Node[11][11];
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                grid[i][j] = new Node();
+            }
+        }
+
+        int x = 5, y = 5; // 시작 위치 (5,5)
+        int count = 0;
+
+        for (char dir : dirs.toCharArray()) {
+            int nx = x, ny = y;
+
+            // 이동할 방향 결정
+            switch (dir) {
+                case 'U':
+                    ny++;
+                    break;
+                case 'D':
+                    ny--;
+                    break;
+                case 'R':
+                    nx++;
+                    break;
+                case 'L':
+                    nx--;
+                    break;
+            }
+
+            // 경계 검사를 통해 유효한 위치인지 확인
+            if (nx < 0 || nx > 10 || ny < 0 || ny > 10) {
+                continue;
+            }
+
+            // 현재 위치의 노드를 가져옴
+            Node currentNode = grid[x][y];
+            Node nextNode = grid[nx][ny];
+
+            // 방향에 따라 노드 상태 업데이트 및 방문 카운트 증가
+            boolean newPath = false;
+            if (dir == 'U' && !currentNode.visitedFromUp) {
+                currentNode.visitedFromUp = true;
+                nextNode.visitedFromDown = true;
+                newPath = true;
+            } else if (dir == 'D' && !currentNode.visitedFromDown) {
+                currentNode.visitedFromDown = true;
+                nextNode.visitedFromUp = true;
+                newPath = true;
+            } else if (dir == 'R' && !currentNode.visitedFromRight) {
+                currentNode.visitedFromRight = true;
+                nextNode.visitedFromLeft = true;
+                newPath = true;
+            } else if (dir == 'L' && !currentNode.visitedFromLeft) {
+                currentNode.visitedFromLeft = true;
+                nextNode.visitedFromRight = true;
+                newPath = true;
+            }
+
+            // 새로운 경로인 경우 카운트 증가
+            if (newPath) {
+                count++;
+            }
+
+            // 현재 위치 업데이트
+            x = nx;
+            y = ny;
+        }
+
+        return count;
+    }
+
+    public int solution4(String dirs) {
+        // 11x11x4 배열을 사용하여 각 위치에서 4방향으로의 이동을 표시
+        // 0: 위, 1: 아래, 2: 오른쪽, 3: 왼쪽
+        boolean[][][] visited = new boolean[11][11][4];
+        int x = 5, y = 5; // 시작 위치 (0,0)을 (5,5)로 매핑
+        int count = 0;
+
+        for (char dir : dirs.toCharArray()) {
+            int nx = x, ny = y, direction = 0;
+
+            switch (dir) {
+                case 'U':
+                    ny++;
+                    direction = 0;
+                    break;
+                case 'D':
+                    ny--;
+                    direction = 1;
+                    break;
+                case 'R':
+                    nx++;
+                    direction = 2;
+                    break;
+                case 'L':
+                    nx--;
+                    direction = 3;
+                    break;
+            }
+
+            // 경계를 벗어나는 경우 무시
+            if (nx < 0 || nx > 10 || ny < 0 || ny > 10) {
+                continue;
+            }
+
+            // 처음 가는 길인 경우 카운트 증가
+            if (!visited[x][y][direction]) {
+                visited[x][y][direction] = true;
+                // 반대 방향도 방문 처리
+                visited[nx][ny][direction ^ 1] = true;
+                count++;
+            }
+
+            x = nx;
+            y = ny;
+        }
+        return count;
+    }
+
 }
