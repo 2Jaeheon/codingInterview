@@ -1,47 +1,41 @@
 import java.util.*;
 class Solution {
-    public static int solution(String dirs) {
-        int x = 0; // x좌표
-        int y = 0; // y좌표
+    public int solution(String dirs) {
+        // 11x11x4 배열을 사용하여 각 위치에서 4방향으로의 이동을 표시
+        // 0: 위, 1: 아래, 2: 오른쪽, 3: 왼쪽
+        boolean[][][] visited = new boolean[11][11][4];
+        int x = 5, y = 5; // 시작 위치 (0,0)을 (5,5)로 매핑
+        int count = 0;
 
-        Set<String> visitedPaths = new HashSet<>();
+        for (char dir : dirs.toCharArray()) {
+            int nx = x, ny = y, direction = 0;
 
-        for (int i = 0; i < dirs.length(); i++) {
-            int nextX = x; //다음에 가야할 x좌표
-            int nextY = y; //다음에 가야할 y좌표
-
-            switch (dirs.charAt(i)) {
+            switch (dir) {
                 case 'U':
-                    nextY += 1;
-                    break;
+                    ny++; direction = 0; break;
                 case 'D':
-                    nextY -= 1;
-                    break;
+                    ny--; direction = 1; break;
                 case 'R':
-                    nextX += 1;
-                    break;
+                    nx++; direction = 2; break;
                 case 'L':
-                    nextX -= 1;
-                    break;
+                    nx--; direction = 3; break;
             }
 
-            // 좌표평면의 경계를 벗어나는 경우 무시
-            if (nextX < -5 || nextX > 5 || nextY < -5 || nextY > 5) {
-                continue;
+            // 경계를 벗어나는 경우 무시
+            if (nx < 0 || nx > 10 || ny < 0 || ny > 10) continue;
+
+            // 처음 가는 길인 경우 카운트 증가
+            if (!visited[x][y][direction]) {
+                visited[x][y][direction] = true;
+                // 반대 방향도 방문 처리
+                visited[nx][ny][direction ^ 1] = true;
+                count++;
             }
 
-            // 이동 경로 저장(0001이면 0,0에서 0,1로 이동)
-            // (추가로 중복을 방지하기 위해 0,1 -> 0,0을 방지하기 위해 위와 반대도 set에 넣어줌)
-            String path1 = x + "" + y + "" + nextX + "" + nextY;
-            String path2 = nextX + "" + nextY + "" + x + "" + y;
-            visitedPaths.add(path1);
-            visitedPaths.add(path2);
-
-            // 위치 업데이트
-            x = nextX;
-            y = nextY;
+            x = nx;
+            y = ny;
         }
 
-        return visitedPaths.size() / 2; // 양방향 경로 저장이므로 2로 나눔
+        return count;
     }
 }
