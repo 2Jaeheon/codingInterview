@@ -1,36 +1,36 @@
 import java.util.*;
 class Solution {
-    public static int solution(String s) {
-        ArrayDeque<Character> queue = new ArrayDeque<>();
-        int count = 0;
-        for (int i = 0; i < s.length(); i++) {
-            queue.add(s.charAt(i));
-        }
-
-        for (int i = 0; i < s.length(); i++) {
-            if(isCorrect(queue)){
-                count++;
+    public int solution(String s) {
+        int n = s.length();
+        char[] chars = s.toCharArray();
+        int answer = 0;
+        
+        for (int start = 0; start < n; start++) {
+            if (isValid(chars, start, n)) {
+                answer++;
             }
-            queue.addLast(queue.pollFirst());
         }
-        return count;
+        
+        return answer;
     }
-
-    public static boolean isCorrect(ArrayDeque<Character> queue) {
-        ArrayDeque<Character> stack = new ArrayDeque<>();
-        for (Character ch : queue) {
-            if (ch == '(' || ch == '[' || ch == '{') {
-                stack.push(ch);
-            } else if (ch == ')' && !stack.isEmpty() && stack.peek() == '(') {
-                stack.pop();
-            } else if (ch == ']' && !stack.isEmpty() && stack.peek() == '[') {
-                stack.pop();
-            } else if (ch == '}' && !stack.isEmpty() && stack.peek() == '{') {
-                stack.pop(); 
+    
+    private boolean isValid(char[] chars, int start, int n) {
+        int[] stack = new int[n];
+        int top = -1;
+        
+        for (int i = 0; i < n; i++) {
+            char c = chars[(start + i) % n];
+            if (c == '(' || c == '{' || c == '[') {
+                stack[++top] = c;
             } else {
-                return false; 
+                if (top == -1) return false;
+                if (c == ')' && stack[top] != '(') return false;
+                if (c == '}' && stack[top] != '{') return false;
+                if (c == ']' && stack[top] != '[') return false;
+                top--;
             }
         }
-        return stack.isEmpty(); 
+        
+        return top == -1;
     }
 }
