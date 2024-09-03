@@ -1,4 +1,4 @@
-package hash;
+package hash.num18;
 
 import java.util.HashSet;
 import java.util.Set;
