@@ -1,4 +1,4 @@
-package hash.num25;
+package tree.num25;
 
 import java.util.Arrays;
 
