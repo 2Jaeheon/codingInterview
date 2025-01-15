@@ -85,6 +85,9 @@ class Graph {
         root.isMarked = true;
 
         while (!stack.isEmpty()) {
+            // DFS의 동작 과정
+            // stack에서 꺼내서 방문하지 않은 인접한 노드들을 stack에 삽입
+            // 위 과정을 스택이 빌 때까지 반복
             Node r = stack.pop();
 
             for (Node n : r.adjacent) {
@@ -111,6 +114,9 @@ class Graph {
         queue.addLast(root);
         root.isMarked = true;
 
+        // BFS 원리
+        // queue에서 데이터를 하나 꺼내서 방문한 노드인지 확인 후 방문하지 않은 노드들을 queue에 추가
+        // 위 과정을 queue가 빌 때까지 반복
         while (!queue.isEmpty()) {
             Node r = queue.pollFirst();
 
