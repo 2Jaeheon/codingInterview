@@ -1,9 +1,6 @@
-package Stack;
+package stack;
 
-import java.lang.reflect.Array;
 import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class 크레인_인형뽑기_게임 {
 

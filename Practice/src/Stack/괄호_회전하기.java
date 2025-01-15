@@ -1,7 +1,6 @@
-package Stack;
+package stack;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class 괄호_회전하기 {

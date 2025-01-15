@@ -1,12 +1,10 @@
-package Stack;
+package stack;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 public class 표_편집 {
 

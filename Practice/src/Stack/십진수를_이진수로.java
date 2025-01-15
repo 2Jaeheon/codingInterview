@@ -1,7 +1,6 @@
-package Stack;
+package stack;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 
 public class 십진수를_이진수로 {
 
