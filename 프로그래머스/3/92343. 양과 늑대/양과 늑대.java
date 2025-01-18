@@ -37,7 +37,7 @@ class Solution {
 
                 if (info[next] == 1) {
                     // 방문하는 순간에는 양이 늑대보다 많은지를 확인해야함.
-                    if (now.sheep != now.wolf + 1) {
+                    if (now.sheep > now.wolf + 1) {
                         queue.add(new Info(next, now.sheep, now.wolf + 1, set));
                     }
                 } else {
