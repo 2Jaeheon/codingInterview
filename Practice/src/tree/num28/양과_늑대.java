@@ -114,12 +114,18 @@ stack과 DFS로 해결하려고 하였으나, 복잡해서 풀이에 실패.
 
         // BFS start
         while (!queue.isEmpty()) {
+            // 큐 객체안에 들어있는 모든 정보를 출력하고싶어.
+            System.out.println("큐: " + queue.stream().map(x -> x.node).toList());
+
             Info now = queue.poll();
 
             // 최대 양의 수 업데이트
             answer = Math.max(answer, now.sheep);
             // 방문한 노드 집합에 현재 노드의 이웃 노드 추가
             now.visited.addAll(tree[now.node]);
+            System.out.println(
+                "양의 개수: " + now.sheep + "  늑대의 개수: " + now.wolf + "  현재 노드: " + now.node
+                    + "   방문할 노드: " + now.visited);
 
             for (int next : now.visited) {
                 HashSet<Integer> set = new HashSet<>(now.visited);
