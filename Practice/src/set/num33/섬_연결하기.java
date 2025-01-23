@@ -2,6 +2,7 @@ package set.num33;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 
@@ -112,7 +113,7 @@ public class 섬_연결하기 {
             // 스택에서 가장 작은 가중치를 가진 간선 선택
             Node current = stack.stream()
                 .filter(node -> !visited[node.destination]) // 방문하지 않은 노드만 선택
-                .min((a, b) -> Integer.compare(a.weight, b.weight))
+                .min(Comparator.comparingInt(a -> a.weight))
                 .orElse(null);
 
             if (current == null) {
