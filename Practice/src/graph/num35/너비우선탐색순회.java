@@ -1,4 +1,4 @@
-package set.num35;
+package graph.num35;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

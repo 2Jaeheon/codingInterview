@@ -1,4 +1,4 @@
-package set.num34;
+package graph.num34;
 
 import java.util.ArrayList;
 import java.util.Arrays;
