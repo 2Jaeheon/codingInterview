@@ -2,6 +2,8 @@ package graph.num37;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class 게임_맵_최단거리 {
 
@@ -82,4 +84,55 @@ public class 게임_맵_최단거리 {
         System.out.println("----------------------------");
     }
 
+    public static int solution2(int[][] maps) {
+        int[] dx = {0, 0, 1, -1}; // 이동 방향 (우, 좌, 하, 상)
+        int[] dy = {1, -1, 0, 0};
+
+        int N = maps.length;
+        int M = maps[0].length;
+        int[][] dist = new int[N][M];
+
+        // 거리 배열을 최댓값으로 초기화
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[2]));
+
+        pq.offer(new int[]{0, 0, 1}); // {row, col, cost}
+        dist[0][0] = 1;
+
+        while (!pq.isEmpty()) {
+            int[] now = pq.poll();
+            int r = now[0], c = now[1], cost = now[2];
+
+            // 도착하면 거리 반환
+            if (r == N - 1 && c == M - 1) {
+                return cost;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                int nr = r + dx[i];
+                int nc = c + dy[i];
+
+                // 범위 확인
+                if (nr < 0 || nc < 0 || nr >= N || nc >= M) {
+                    continue;
+                }
+
+                // 벽이면 패스
+                if (maps[nr][nc] == 0) {
+                    continue;
+                }
+
+                // 더 짧은 경로가 있으면 갱신 후 큐에 추가
+                int newCost = cost + 1;
+                if (newCost < dist[nr][nc]) {
+                    dist[nr][nc] = newCost;
+                    pq.offer(new int[]{nr, nc, newCost});
+                }
+            }
+        }
+        return -1; // 도달 불가능한 경우
+    }
 }
