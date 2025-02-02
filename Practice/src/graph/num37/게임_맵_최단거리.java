@@ -18,7 +18,7 @@ public class 게임_맵_최단거리 {
 
         System.out.println("최단 거리: " + solution(maps));
     }
-
+/*
     public static int solution(int[][] maps) {
         // 시작 지점: (0,0), 종료 지점: 게임 맵 우측 하단
 
@@ -134,5 +134,58 @@ public class 게임_맵_최단거리 {
             }
         }
         return -1; // 도달 불가능한 경우
+    }*/
+
+    static int[] x = new int[]{1, -1, 0, 0};
+    static int[] y = new int[]{0, 0, -1, 1};
+
+    static class Node {
+
+        int row;
+        int col;
+
+        public Node(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+
+    public static int solution(int[][] maps) {
+        final int N = maps.length;
+        final int M = maps[0].length;
+
+        int[][] graph = new int[N][M];
+        for (int[] row : graph) {
+            Arrays.fill(row, 0);
+        }
+
+        ArrayDeque<Node> queue = new ArrayDeque<>();
+        queue.offer(new Node(0, 0));
+        graph[0][0] = 1;
+
+        while (!queue.isEmpty()) {
+            Node now = queue.poll();
+
+            for (int i = 0; i < 4; i++) {
+                int newRow = now.row + x[i];
+                int newCol = now.col + y[i];
+
+                if (newRow < 0 || newCol < 0 || newRow >= N || newCol >= M) {
+                    continue;
+                }
+
+                if (maps[newRow][newCol] == 0) {
+                    continue;
+                }
+
+                if (graph[newRow][newCol] == 0) {
+                    queue.offer(new Node(newRow, newCol));
+                    graph[newRow][newCol] = graph[now.row][now.col] + 1;
+                }
+            }
+        }
+
+        return (graph[N - 1][M - 1] == 0) ? -1 : graph[N - 1][M - 1];
     }
 }
