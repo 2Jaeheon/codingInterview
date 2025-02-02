@@ -3,6 +3,7 @@ package graph.num38;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class 네트워크 {
 
@@ -13,7 +14,7 @@ public class 네트워크 {
             {1, 1, 0},
             {0, 0, 1}
         };
-        System.out.println(solution(n, computers));
+        System.out.println(solution2(n, computers));
     }
 
     public static int solution(int n, int[][] computers) {
@@ -63,6 +64,51 @@ public class 네트워크 {
                 System.out.print(neighbor + " ");
             }
             System.out.println();
+        }
+    }
+
+    public static int solution2(int n, int[][] computers) {
+        int[] parent = new int[n];
+
+        // 1. 부모 배열 초기화 (각 노드는 자기 자신이 부모)
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+
+        // 2. 유니온 연산 수행
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i != j && computers[i][j] == 1) {
+                    union(parent, i, j);
+                }
+            }
+        }
+
+        // 3. 고유한 루트 노드의 개수 찾기
+        HashSet<Integer> uniqueRoots = new HashSet<>();
+
+        for (int i = 0; i < n; i++) {
+            uniqueRoots.add(find(parent, i));
+        }
+
+        return uniqueRoots.size();
+    }
+
+    // 부모 노드를 찾는 함수 (경로 압축 기법 적용)
+    private static int find(int[] parent, int x) {
+        if (parent[x] == x) {
+            return x;
+        }
+        return parent[x] = find(parent, parent[x]);  // 경로 압축
+    }
+
+    // 두 노드를 하나의 집합으로 합치는 함수
+    private static void union(int[] parent, int a, int b) {
+        int rootA = find(parent, a);
+        int rootB = find(parent, b);
+
+        if (rootA != rootB) {
+            parent[rootB] = rootA; // 하나의 루트로 통합
         }
     }
 }
