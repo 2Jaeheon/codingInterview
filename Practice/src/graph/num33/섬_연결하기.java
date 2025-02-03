@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Stack;
 
 public class 섬_연결하기 {
@@ -13,7 +14,7 @@ public class 섬_연결하기 {
         int[][] costs = new int[][]{{0, 1, 1}, {0, 2, 2}, {1, 2, 5}, {1, 3, 1}, {2, 3, 8}};
         int n1 = 5;
         int[][] costs1 = new int[][]{{0, 1, 1}, {1, 3, 1}, {1, 4, 2}, {2, 3, 2}};
-        System.out.println(solution(n, costs));
+        System.out.println(solution3(n, costs));
         //System.out.println(solution(n1, costs1));
     }
 
@@ -85,13 +86,7 @@ public class 섬_연결하기 {
         }
 
         System.out.println("그래프 생성");
-        for (int[] cost : costs) {
-            int from = cost[0];
-            int to = cost[1];
-            int weight = cost[2];
-            graph[from].add(new Node(to, weight));
-            graph[to].add(new Node(from, weight));
-        }
+        generateGraph(costs, graph);
 
         System.out.println("그래프 출력");
         for (int i = 0; i < n; i++) {
@@ -196,4 +191,60 @@ public class 섬_연결하기 {
         int root2 = find(y);
         parent[root2] = root1;
     }
+
+
+    // Prim 알고리즘을 사용한 풀이
+    public static int solution3(int n, int[][] costs) {
+        List<Node>[] graph = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+
+        // 그래프 생성
+        generateGraph(costs, graph);
+
+        // 우선순위 큐 (가중치가 작은 간선 우선)
+        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
+        boolean[] visited = new boolean[n];
+        visited[0] = true; // 시작 노드 방문
+
+        // 시작 노드(0)와 연결된 간선을 모두 추가
+        pq.addAll(graph[0]);
+
+        int answer = 0;
+        int edgeCount = 0; // 추가된 간선 개수
+
+        while (!pq.isEmpty() && edgeCount < n - 1) {
+            Node current = pq.poll(); // 가장 가중치가 작은 간선 선택
+
+            if (visited[current.destination]) {
+                continue; // 이미 방문한 노드는 무시
+            }
+
+            // 최소 신장 트리에 추가
+            answer += current.weight;
+            visited[current.destination] = true;
+            edgeCount++; // 연결된 간선 개수 증가
+
+            // 현재 노드와 연결된 간선들 추가
+            for (Node neighbor : graph[current.destination]) {
+                if (!visited[neighbor.destination]) {
+                    pq.add(neighbor);
+                }
+            }
+        }
+
+        return answer;
+    }
+
+    private static void generateGraph(int[][] costs, List<Node>[] graph) {
+        for (int[] cost : costs) {
+            int from = cost[0];
+            int to = cost[1];
+            int weight = cost[2];
+            graph[from].add(new Node(to, weight));
+            graph[to].add(new Node(from, weight));
+        }
+    }
+
 }
