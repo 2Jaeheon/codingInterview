@@ -1,65 +1,61 @@
 import java.util.*;
 class Solution {
-    static class Info {
-
-        int node, sheep, wolf;
-        HashSet<Integer> visited;
-
-        public Info(int node, int sheep, int wolf, HashSet<Integer> visited) {
-            this.node = node;
-            this.sheep = sheep;
-            this.wolf = wolf;
-            this.visited = visited;
-        }
-    }
+    
+    static List<Integer>[] tree;
+    static int maxSheep = 0;
 
     public static int solution(int[] info, int[][] edges) {
-        // 현재 위치, 양의 수, 늑대의 수, 방문한 노드 저장을 위한 클래스
-        buildTree(info, edges);
-        int answer = 0;
 
-        // BFS를 위한 큐 생성 및 초기 상태 설정
-        ArrayDeque<Info> queue = new ArrayDeque<>();
-        queue.add(new Info(0, 1, 0, new HashSet<>()));
+        // info: 양 또는 늑대 정보 (0이 양, 1이 늑대)
+        // edges: 부모 - 자식 pair
+        int n = info.length;
+        tree = new ArrayList[n];
 
-        // BFS start
-        while (!queue.isEmpty()) {
-            Info now = queue.poll();
-
-            // 최대 양의 수 업데이트
-            answer = Math.max(answer, now.sheep);
-            // 방문한 노드 집합에 현재 노드의 이웃 노드 추가
-            now.visited.addAll(tree[now.node]);
-
-            for (int next : now.visited) {
-                HashSet<Integer> set = new HashSet<>(now.visited);
-                set.remove(next);
-
-                if (info[next] == 1) {
-                    // 방문하는 순간에는 양이 늑대보다 많은지를 확인해야함.
-                    if (now.sheep > now.wolf + 1) {
-                        queue.add(new Info(next, now.sheep, now.wolf + 1, set));
-                    }
-                } else {
-                    queue.add(new Info(next, now.sheep + 1, now.wolf, set));
-                }
-            }
-
-        }
-        return answer;
-    }
-
-    // 트리 정보를 저장할 인접 리스트
-    private static ArrayList<Integer>[] tree;
-
-    private static void buildTree(int[] info, int[][] edges) {
-        tree = new ArrayList[info.length];
-        for (int i = 0; i < tree.length; i++) {
+        for (int i = 0; i < n; i++) {
             tree[i] = new ArrayList<>();
         }
 
+        // edges를 순회하며 부모에다가 자식을 추가
         for (int[] edge : edges) {
             tree[edge[0]].add(edge[1]);
+        }
+
+        List<Integer> nextNodes = new ArrayList<>();
+        nextNodes.add(0); // 루트에서 시작
+
+        dfs(0, 0, 0, nextNodes, info);
+
+        return maxSheep;
+    }
+
+    private static void dfs(int current, int sheep, int wolf, List<Integer> nextNodes, int[] info) {
+        // 현재 노드 정보 반영
+        if (info[current] == 0) {
+            sheep++;
+        } else {
+            wolf++;
+        }
+
+        // 조건 위반 시 중단
+        if (wolf >= sheep) {
+            return;
+        }
+
+        // 최대값 갱신
+        maxSheep = Math.max(maxSheep, sheep);
+
+        // 다음 이동 후보들 준비
+        List<Integer> candidates = new ArrayList<>(nextNodes);
+        candidates.remove(Integer.valueOf(current)); // 현재 노드 제거
+
+        // 현재 노드의 자식 노드들 추가
+        for (int child : tree[current]) {
+            candidates.add(child);
+        }
+
+        // 후보 노드들 DFS 순회
+        for (int next : candidates) {
+            dfs(next, sheep, wolf, candidates, info);
         }
     }
 }
