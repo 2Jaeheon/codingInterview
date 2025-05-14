@@ -1,18 +1,5 @@
 import java.util.*;
 class Solution {
-     public static int[][] solution(int[][] nodeinfo) {
-        Node root = makeBT(nodeinfo);
-        ArrayList<Integer> preOrderList = new ArrayList<>();
-        preOrder(root, preOrderList);
-        ArrayList<Integer> postOrderList = new ArrayList<>();
-        postOrder(root, postOrderList);
-
-        int[][] answer = new int[2][nodeinfo.length];
-        answer[0] = preOrderList.stream().mapToInt(Integer::intValue).toArray();
-        answer[1] = postOrderList.stream().mapToInt(Integer::intValue).toArray();
-        return answer;
-    }
-
     public static class Node {
 
         int num;
@@ -27,13 +14,15 @@ class Solution {
         }
     }
 
-    public static Node makeBT(int[][] nodeinfo) {
-        Node[] nodes = new Node[nodeinfo.length];
+    public static int[][] solution(int[][] nodeInfo) {
+        Node[] nodes = new Node[nodeInfo.length];
 
-        for (int i = 0; i < nodeinfo.length; i++) {
-            nodes[i] = new Node(i + 1, nodeinfo[i][0], nodeinfo[i][1]);
+        // 각 노드에 좌표 및 번호를 저장함.
+        for (int i = 0; i < nodeInfo.length; i++) {
+            nodes[i] = new Node(i + 1, nodeInfo[i][0], nodeInfo[i][1]);
         }
 
+        // y를 기준으로 내림차순 정렬
         Arrays.sort(nodes, (o1, o2) -> {
             if (o1.y == o2.y) {
                 return Integer.compare(o1.x, o2.x);
@@ -41,11 +30,14 @@ class Solution {
             return Integer.compare(o2.y, o1.y);
         });
 
+        // 맨 처음 노드는 루트
         Node root = nodes[0];
 
         for (int i = 1; i < nodes.length; i++) {
             Node parent = root;
+
             while (true) {
+                // 부모 노드의 x 좌료가 더 크면 왼쪽
                 if (nodes[i].x < parent.x) {
                     if (parent.left == null) {
                         parent.left = nodes[i];
@@ -53,7 +45,7 @@ class Solution {
                     } else {
                         parent = parent.left;
                     }
-                } else {
+                } else { // 부모 노드의 x 좌표가 더 작거나 같으면 오른쪽
                     if (parent.right == null) {
                         parent.right = nodes[i];
                         break;
@@ -63,25 +55,41 @@ class Solution {
                 }
             }
         }
-        return nodes[0];
-    }
 
-    private static void preOrder(Node curr, ArrayList<Integer> answer) {
-        if (curr == null) {
-            return;
+        // 순회 결과 저장용 리스트
+        List<Integer> preorderList = new ArrayList<>();
+        List<Integer> postorderList = new ArrayList<>();
+
+        preorder(root, preorderList);
+        postorder(root, postorderList);
+
+        // 결과 변환
+        int[][] result = new int[2][nodeInfo.length];
+        for (int i = 0; i < nodeInfo.length; i++) {
+            result[0][i] = preorderList.get(i);
+            result[1][i] = postorderList.get(i);
         }
 
-        answer.add(curr.num);
-        preOrder(curr.left, answer);
-        preOrder(curr.right, answer);
+        return result;
     }
 
-    private static void postOrder(Node curr, ArrayList<Integer> answer) {
-        if (curr == null) {
+    // 전위 순회
+    public static void preorder(Node node, List<Integer> result) {
+        if (node == null) {
             return;
         }
-        postOrder(curr.left, answer);
-        postOrder(curr.right, answer);
-        answer.add(curr.num);
+        result.add(node.num);
+        preorder(node.left, result);
+        preorder(node.right, result);
+    }
+
+    // 후위 순회
+    public static void postorder(Node node, List<Integer> result) {
+        if (node == null) {
+            return;
+        }
+        postorder(node.left, result);
+        postorder(node.right, result);
+        result.add(node.num);
     }
 }
