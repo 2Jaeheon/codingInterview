@@ -10,37 +10,45 @@ public class Main {
 
         int n = sc.nextInt();
         int m = sc.nextInt();
+        Stack<Node> stack = new Stack<>();
+        stack.push(new Node(0, 1, new ArrayList<>()));
+        
+        while(!stack.isEmpty()) {
+            Node current = stack.pop();
 
-        List<Integer> list = new ArrayList<>();
-        int depth = 0;
-        int start = 1;
+            // 현재 스택에서 뺀 노드의 깊이가 m이면 출력
+            if (current.depth == m) {
+                // 리스트에 담긴 값을 모두 출력
+                for (int num : current.list) {
+                    System.out.print(num + " ");
+                }
+                System.out.println();
+                continue;
+            }
 
-        recur(1, 0, list, n, m);
+            // 현재 노드의 깊이가 m보다 작은경우
+            for(int i = n; i >= current.start; i--) {
+                // 스택에 내림차순으로 저장해서 사전순서대로 가능하도록 함.
+                // pop과 push 는 반대이니까
+                List<Integer> nextList = new ArrayList<>(current.list);
+
+                nextList.add(i);
+
+                stack.push(new Node(current.depth + 1, i + 1, nextList));
+            }
+        }
+        
     }
 
-    public static void recur(int start, int depth, List<Integer> list, int n, int m) {
-        // 종료 조건 depth와 m이 같아졌을 때
-        if(depth == m) {
-            for(int num : list) {
-                System.out.print(num + " ");
-            }
-            System.out.println();
-            return;
-        }
+    static class Node {
+        private int depth; // 지금까지 탐험한 깊이
+        private int start; // 시작 위치
+        List<Integer> list; // 지금까지 고른 수열
 
-        // m개가 아직 다 차지 않았다면 추가
-        // start보다 하나 더 큰 값을 추가했기 때문에 오름차순으로 됨.
-        for(int i = start; i <= n; i++) {
-            // // 리스트를 만들고
-            // List<Integer> next = new ArrayList<>(list);
-            // // 리스트에 추가해서
-            // next.add(i);
-            // // start 값과 depth 값을 1씩 추가해서 재귀 
-            // recur(i + 1, depth + 1, next, n, m);
-
-            list.add(i); // push
-            recur(i + 1, depth + 1, list, n, m);
-            list.remove(list.size() - 1); // pop
+        Node(int depth, int start, List<Integer> list) {
+            this.depth = depth;
+            this.start = start;
+            this.list = list;
         }
     }
 }
