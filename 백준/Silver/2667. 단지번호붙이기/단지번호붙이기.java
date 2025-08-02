@@ -25,46 +25,30 @@ public class Main {
         for(int i = 0; i <= n; i++) {
             Arrays.fill(division[i], -1);
         }
-        
+
+        List<Integer> houseCounts = new ArrayList<>();
         for(int i = 0; i < n; i++) {
             for(int j = 0; j < n; j++) {
                 // 아직 방문하지 않았고, 집이 있는 곳만 처리
                 if(division[i][j] == -1 && graph[i][j] == 1) {
-                    bfs(graph, division, i, j, n, count++);
+                    int houseCount = bfs(graph, division, i, j, n, count++);
+                    houseCounts.add(houseCount);
                 }
             }
         }   
 
-        // 각 단지별 집 개수 계산
-        int[] countPerComplex = new int[count]; // index = 단지 번호
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (division[i][j] != -1) {
-                    countPerComplex[division[i][j]]++;
-                }
-            }
-        }
-
-        // 결과 출력
-        System.out.println(count - 1); // 단지 개수
-        List<Integer> result = new ArrayList<>();
-        
-        for (int i = 1; i < count; i++) {
-            result.add(countPerComplex[i]);
-        }
-        
-        Collections.sort(result);
-        
-        for (int cnt : result) {
-            System.out.println(cnt);
+        System.out.println(houseCounts.size());
+        Collections.sort(houseCounts);
+        for (int houseCount : houseCounts) {
+            System.out.println(houseCount);
         }
     }
 
-    public static void bfs(int[][] graph, int[][] division, int x, int y, int n, int count) {
+    public static int bfs(int[][] graph, int[][] division, int x, int y, int n, int count) {
         Queue<int[]> queue = new ArrayDeque<>();
         queue.offer(new int[]{x, y});
         division[x][y] = count;
-
+        int houseCount = 1;
 
         while(!queue.isEmpty()) {
             int[] cur = queue.poll();
@@ -78,9 +62,12 @@ public class Main {
                     if (graph[nextX][nextY] == 1 && division[nextX][nextY] == -1) {
                         queue.offer(new int[]{nextX, nextY});
                         division[nextX][nextY] = count;
+                        houseCount++;
                     }
                 }
             }
         }
+
+        return houseCount;
     }
 }
