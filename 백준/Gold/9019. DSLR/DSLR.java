@@ -1,78 +1,57 @@
+import java.io.*;
 import java.util.*;
 
-public class Main{
-    public static void main(String args[]){
-        Scanner sc = new Scanner(System.in);
+public class Main {
+    static int D(int n) { return (2 * n) % 10000; }
+    static int S(int n) { return (n + 9999) % 10000; }
+    static int L(int n) { return (n % 1000) * 10 + (n / 1000); }
+    static int R(int n) { return (n % 10) * 1000 + (n / 10); }
 
-        // D S L R을 사용하는 계산기
-        // 레지스터에는 0 ~ 10000의 십진수 저장
-        // 각 명령어는 레지스터에 저장된 n을 변환
-        int T = sc.nextInt(); // 테스트 케이스 개수
-    
-        // BFS 아닐까??
-        // 각 상황에서 DSLR 네 가지를 모두 수행해볼 수 있도록 하면 어떨까
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder out = new StringBuilder();
+        int T = Integer.parseInt(br.readLine());
 
-        // Queue에는 뭘 저장? => Integer
-        // 방문처리 필요? => X
-        // D,S,L,R 연산 필요
-        char[] operators = new char[]{'D', 'S', 'L', 'R'};
+        while (T-- > 0) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int A = Integer.parseInt(st.nextToken());
+            int B = Integer.parseInt(st.nextToken());
 
-        for(int i = 0; i < T; i++) {
-            int A = sc.nextInt(); // 레지스터의 초기값
-            int B = sc.nextInt(); // 레지스터의 최종값
-
-            Queue<Node> queue = new ArrayDeque<>();
-            queue.offer(new Node(A));
             boolean[] visited = new boolean[10000];
+            int[] prev = new int[10000];     // prev[x] = x로 오기 전 상태
+            char[] op = new char[10000];     // op[x] = prev[x] -> x 에 사용된 연산
+            Arrays.fill(prev, -1);
+
+            ArrayDeque<Integer> q = new ArrayDeque<>();
+            q.offer(A);
             visited[A] = true;
 
-            // 큐가 빌때까지 반복
-            while(!queue.isEmpty()) {
-                Node cur = queue.poll();
-                int curN = cur.number;
+            while (!q.isEmpty()) {
+                int cur = q.poll();
+                if (cur == B) break;
 
-                if(curN == B) {
-                    for(char C : cur.list) {
-                        System.out.print(C);
-                    }
-                    System.out.println();
-                }
-                
-                for(char op : operators) {
-                    int next = 0;
-                    
-                    if(op == 'D') { // D operation
-                        next = (2 * curN) % 10000;
-                    } else if(op == 'S') { // S operation
-                        next = (curN + 9999) % 10000;
-                    } else if(op == 'L') { // L operation
-                        next = (curN % 1000) * 10 + (curN / 1000);
-                    } else if(op == 'R') { // R operation
-                        next = (curN % 10) * 1000 + (curN / 10);
-                    }
+                int[] cand = { D(cur), S(cur), L(cur), R(cur) };
+                char[] ops  = { 'D',     'S',     'L',     'R' };
 
-                    if (!visited[next]) {
-                        visited[next] = true;
-                        queue.offer(new Node(next, op, cur.list));
+                for (int i = 0; i < 4; i++) {
+                    int nxt = cand[i];
+                    if (!visited[nxt]) {
+                        visited[nxt] = true;
+                        prev[nxt] = cur; // 이전 상태가 뭐였는지를 저장
+                        op[nxt] = ops[i]; // 어떤 연산자를 썼는지 저장
+                        q.offer(nxt);
                     }
                 }
             }
-        }
-    }
 
-    public static class Node {
-        int number;
-        List<Character> list = new ArrayList<>();
-
-        public Node(int number) {
-            this.number = number;
+            // 역추적: B -> A
+            StringBuilder path = new StringBuilder();
+            for (int x = B; x != A; x = prev[x]) {
+                path.append(op[x]);
+            }
+            out.append(path.reverse()).append('\n');
         }
 
-        // 부모의 리스트를 그대로 더한다음 op를 추가해서 누적
-        public Node(int number, char op, List<Character> parentList) {
-            this.number = number;
-            this.list.addAll(parentList);
-            this.list.add(op);
-        }
+        System.out.print(out.toString());
     }
 }
