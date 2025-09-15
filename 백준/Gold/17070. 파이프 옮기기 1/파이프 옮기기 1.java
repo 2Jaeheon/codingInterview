@@ -5,82 +5,48 @@ public class Main{
     static int N;
     static int answer = 0;
     static int[][] arr;
+    
     public static void main(String args[]){
         Scanner sc = new Scanner(System.in);
-
-        // 파이플를 밀 수 있는 방향은 세가지.
-        // 파이프의 한쪽 끝을 N, N으로 이동하는 방법의 개수 
         N = sc.nextInt();
-        // 가로일때랑 세로일때랑 대각선일때를 체크한 뒤 해야하는 것으로 이동을 시킴
-        // 그러면 또 이동했을때의 상태를 체크한 뒤 벽을 체크해서 다음으로 이동시킴
-
         arr = new int[N][N];
+        
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
                 arr[i][j] = sc.nextInt();
             }
         }
-        dfs(new Pipe(0, 1, 0));
+
+        // DP로 풀어보도록 하자.
+        // DP[r][c][direction]: 파이프의 오른쪽 아래 끝부분이 (r, c) 좌표에 direction 방향으로 도착하는 방법의 수
+        long[][][] dp = new long[N][N][3];
+        // dp[r][c][0] 이 되기 위해서는 이전에 가로 또는 대각선 이었어야 함.
         
+        dp[0][1][0] = 1;
+
+        for(int r = 0; r < N; r++) {
+            for(int c = 2; c < N; c++) {
+                if(arr[r][c] == 1) {
+                    continue;
+                }
+
+                // r, c에 가로로 도착하는 경우
+                dp[r][c][0] = dp[r][c-1][0] + dp[r][c-1][2];
+                // r, c에 세로로 도착하는 경우
+                
+                if (r > 0) {
+                    // 이전 칸 (r-1, c)이 세로 또는 대각선이었어야 함
+                    dp[r][c][1] = dp[r-1][c][1] + dp[r-1][c][2];
+                }
+
+                if (r > 0 && arr[r-1][c] == 0 && arr[r][c-1] == 0) {
+                    // 이전 칸 (r-1, c-1)이 가로, 세로, 대각선 모두 가능
+                    dp[r][c][2] = dp[r-1][c-1][0] + dp[r-1][c-1][1] + dp[r-1][c-1][2];
+                }
+            }
+        }
+        
+        long answer = dp[N-1][N-1][0] + dp[N-1][N-1][1] + dp[N-1][N-1][2];
         System.out.println(answer);
-    }
-
-    public static void dfs(Pipe pipe) {
-        // 종료조건
-        if(pipe.r == N - 1 && pipe.c == N - 1) {
-            answer++;
-            return ;
-        }
-
-        // 다음 칸이 벽이라면 다음걸 진행해야함
-        if(pipe.direction == 0) { // 오른쪽
-            // 오른쪽으로 이동
-            if (pipe.c + 1 < N && arr[pipe.r][pipe.c + 1] == 0) {
-                dfs(new Pipe(pipe.r, pipe.c + 1, 0));
-            }
-            // 대각선으로 이동
-            if (pipe.r + 1 < N && pipe.c + 1 < N && arr[pipe.r][pipe.c + 1] == 0 && arr[pipe.r + 1][pipe.c] == 0 && arr[pipe.r + 1][pipe.c + 1] == 0) {
-                dfs(new Pipe(pipe.r + 1, pipe.c + 1, 2));
-            }
-        }
-
-        if(pipe.direction == 1) { // 아래
-            // 아래로 이동
-            if (pipe.r + 1 < N && arr[pipe.r + 1][pipe.c] == 0) {
-                dfs(new Pipe(pipe.r + 1, pipe.c, 1));
-            }
-            // 대각선으로 이동
-            if (pipe.r + 1 < N && pipe.c + 1 < N && arr[pipe.r][pipe.c + 1] == 0 && arr[pipe.r + 1][pipe.c] == 0 && arr[pipe.r + 1][pipe.c + 1] == 0) {
-                dfs(new Pipe(pipe.r + 1, pipe.c + 1, 2));
-            }
-        }
-
-        if(pipe.direction == 2) { // 대각선 아래
-            // 오른쪽으로 이동
-            if (pipe.c + 1 < N && arr[pipe.r][pipe.c + 1] == 0) {
-                dfs(new Pipe(pipe.r, pipe.c + 1, 0));
-            }
-            // 아래로 이동
-            if (pipe.r + 1 < N && arr[pipe.r + 1][pipe.c] == 0) {
-                dfs(new Pipe(pipe.r + 1, pipe.c, 1));
-            }
-            // 대각선으로 이동
-            if (pipe.r + 1 < N && pipe.c + 1 < N && arr[pipe.r][pipe.c + 1] == 0 && arr[pipe.r + 1][pipe.c] == 0 && arr[pipe.r + 1][pipe.c + 1] == 0) {
-                dfs(new Pipe(pipe.r + 1, pipe.c + 1, 2));
-            }
-        }
-        
-    }
-
-    static class Pipe {
-        int r;
-        int c;
-        int direction; // 0: 가로, 1: 세로, 2: 대각선
-
-        public Pipe(int r, int c, int direction) {
-            this.r = r;
-            this.c = c;
-            this.direction = direction;
-        }
     }
 }
