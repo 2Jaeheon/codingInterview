@@ -1,65 +1,93 @@
 import java.util.*;
 
-public class Main {
-    // Integer.MAX_VALUE를 사용하면 덧셈 과정에서 오버플로우가 날 수 있으므로
-    // 문제의 제약조건을 고려한 적당히 큰 값을 사용합니다. (100 * 15 = 1500 이 최대 거리)
-    static final int INF = 100_000_000;
+public class Main{
+    static int n;
+    static int m;
+    static int r;
+    static List<List<Edge>> graph;
+    static Map<Integer, Integer> itemInfo;
+    
+    static class Edge {
+        int to;
+        int length;
 
-    public static void main(String args[]) {
+        public Edge(int to, int length) {
+            this.to = to;
+            this.length = length;
+        }
+    }
+    
+    public static void main(String args[]){
         Scanner sc = new Scanner(System.in);
+        n = sc.nextInt();
+        m = sc.nextInt();
+        r = sc.nextInt();
 
-        int n = sc.nextInt(); // 지역 개수
-        int m = sc.nextInt(); // 수색범위
-        int r = sc.nextInt(); // 길의 개수
-
-        int[] items = new int[n + 1];
-        for (int i = 1; i <= n; i++) {
-            items[i] = sc.nextInt();
+        graph = new ArrayList<>();
+        itemInfo = new HashMap<>();
+        for(int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
         }
 
-        // 1. 2차원 배열 준비 및 초기화
-        int[][] dist = new int[n + 1][n + 1];
-        for (int i = 1; i <= n; i++) {
-            Arrays.fill(dist[i], INF);
-            dist[i][i] = 0; // 자기 자신으로 가는 거리는 0
+        for(int i = 1; i <= n; i++) {
+            itemInfo.put(i, sc.nextInt());
         }
 
-        // 입력받은 길 정보로 배열 채우기
-        for (int i = 0; i < r; i++) {
+        for(int i = 0; i < r; i++) {
             int from = sc.nextInt();
             int to = sc.nextInt();
-            int length = sc.nextInt();
-            // 양방향이므로 양쪽 모두 값을 넣어줌
-            dist[from][to] = length;
-            dist[to][from] = length;
+            int len = sc.nextInt();
+
+            graph.get(from).add(new Edge(to, len));
+            graph.get(to).add(new Edge(from, len));
         }
 
-        // 2. 플로이드-워셜 알고리즘 실행
-        for (int k = 1; k <= n; k++) { // k: 거쳐가는 노드
-            for (int i = 1; i <= n; i++) { // i: 출발 노드
-                for (int j = 1; j <= n; j++) { // j: 도착 노드
-                    // i에서 j로 바로 가는 것보다 k를 거쳐 가는 게 더 빠르다면 갱신
-                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                    }
+        // dijkstra
+        int answer = 0;
+        for(int i = 1; i <= n; i++) {
+            int[] dist = dijkstra(i);
+            int sum = 0;
+            
+            for(int j = 0; j < dist.length; j++) {
+                if(dist[j] <= m) {
+                    sum += itemInfo.get(j);
                 }
             }
+            
+            answer = Math.max(answer, sum);
         }
 
-        // 3. 결과 계산
-        int maxItemCount = 0;
-        // i번 지역에 떨어졌을 경우를 계산
-        for (int i = 1; i <= n; i++) {
-            int currentItemCount = 0;
-            // j번 지역까지의 거리가 수색범위 m 이하인지 확인
-            for (int j = 1; j <= n; j++) {
-                if (dist[i][j] <= m) {
-                    currentItemCount += items[j];
-                }
-            }
-            maxItemCount = Math.max(maxItemCount, currentItemCount);
-        }
-
-        System.out.println(maxItemCount);
+        System.out.println(answer);
     }
+
+    public static int[] dijkstra(int start) {
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, 100_000_000);
+        
+        PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.length));
+        dist[start] = 0;
+        pq.offer(new Edge(start, 0));
+
+        while(!pq.isEmpty()) {
+            Edge cur = pq.poll();
+            int curTo = cur.to;
+            int curLen = cur.length;
+
+            if(curLen > dist[curTo])
+                continue;
+
+            for(Edge next : graph.get(curTo)) {
+                int nextLength = curLen + next.length;
+
+                if(nextLength < dist[next.to]) {
+                    dist[next.to] = nextLength;
+                    pq.offer(new Edge(next.to, nextLength));
+                }
+            }
+        }
+
+        return dist;
+    }
+
+    
 }
