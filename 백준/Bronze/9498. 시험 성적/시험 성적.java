@@ -14,7 +14,7 @@ public class Main{
             System.out.println("C");
         } else if (score >= 60) {
             System.out.println("D");
-        } else {
+        } else if (score >= 0) {
             System.out.println("F");
         }
     }
